@@ -9,8 +9,8 @@ URL="https://api.github.com"
 #Get Github username and token values from user
 #In GitHub dashboard Settings--DeveloperSettings--PersonalAccessToken--Tokens(clasic)
 #Export both username and token before executing the script
-USERNAME=$username
-TOKEN=$token
+USERNAME="$username"
+TOKEN="$token"
 
 #get the name of repo owner and repository that are endpoint of the URL from users
 REPO_OWNER=$1
@@ -21,7 +21,7 @@ function api_get {
      local endpoint="$1"  #gets the placholder replaced by the value of endpoint
      local url="${URL}/${endpoint}"  #calls the value of URL and endpoint to form the listing issues command
      
-      curl -s -u "${USERNAME}:${TOKEN}" "url"   #-u gets the username and token
+      curl -s -u "${USERNAME}:${TOKEN}" "$url"   #-u gets the username and token
 
 }
 
@@ -31,10 +31,14 @@ function list {
 #use jq to parse json output and get the login id for object that satisfies the logic
       issues="$(github_api_get "$endpoint" | jq -r '.[] | select(.permissions.admin == true ) | .login' )"
 
-      if [[ -z "$issues"]]; then
+      if [[ -z "$issues" ]]; then
          echo " no users found"
       else
           echo "users with read access to ${REPO_OWNER}/${REPO_NAME}:"
           echo "$issues"
       fi       
   }
+
+# Main script
+echo "Listing users with admin access to ${REPO_OWNER}/${REPO_NAME}..."
+list
